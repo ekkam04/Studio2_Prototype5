@@ -1088,8 +1088,9 @@ GameObject:
   - component: {fileID: 3223074776907398026}
   - component: {fileID: 8442040165160571167}
   - component: {fileID: 2193804249493690232}
-  - component: {fileID: 4718093736157006168}
   - component: {fileID: 8784502340237668740}
+  - component: {fileID: 4718093736157006168}
+  - component: {fileID: 8620683954663660594}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1164,34 +1165,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 1
---- !u!114 &4718093736157006168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7145390796124275421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4acf19f5289dee841b035d520250e686, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orientation: {fileID: 6524825116760940723}
-  cameraObj: {fileID: 0}
-  playerObj: {fileID: 6714086187223601055}
-  rotationSpeed: 5
-  rb: {fileID: 2193804249493690232}
-  anim: {fileID: 8442040165160571167}
-  jumpHeightApex: 1.5
-  jumpDuration: 0.3
-  downwardsGravityMultiplier: 1.5
-  speed: 2
-  maxSpeed: 2.5
-  groundDrag: 3
-  isJumping: 0
-  hasLanded: 1
-  isGrounded: 0
-  groundDistance: 1
 --- !u!136 &8784502340237668740
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1215,6 +1188,101 @@ CapsuleCollider:
   m_Height: 1.3510011
   m_Direction: 1
   m_Center: {x: 0, y: 0.6746145, z: 0}
+--- !u!114 &4718093736157006168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7145390796124275421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4acf19f5289dee841b035d520250e686, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orientation: {fileID: 6524825116760940723}
+  cameraObj: {fileID: 0}
+  playerObj: {fileID: 6714086187223601055}
+  itemHolder: {fileID: 0}
+  rotationSpeed: 5
+  rb: {fileID: 2193804249493690232}
+  anim: {fileID: 8442040165160571167}
+  jumpHeightApex: 1.5
+  jumpDuration: 0.3
+  downwardsGravityMultiplier: 1.5
+  speed: 2
+  maxSpeed: 2.5
+  groundDrag: 3
+  isJumping: 0
+  hasLanded: 1
+  isGrounded: 0
+  groundDistance: 1
+--- !u!114 &8620683954663660594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7145390796124275421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: fc5bc96f9e57e484aaf9df170d629a71, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4718093736157006168}
+        m_TargetAssemblyTypeName: Ekkam.Player, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 333f042f-6569-4b49-a480-e9f676d8af9f
+    m_ActionName: Player/Movement[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9c741241-482f-461e-9f16-7cfdb5a25824
+    m_ActionName: Player/Look[/Mouse/delta,/XInputControllerWindows/rightStick,/XInputControllerWindows1/rightStick]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4718093736157006168}
+        m_TargetAssemblyTypeName: Ekkam.Player, Assembly-CSharp
+        m_MethodName: OnInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 43e92121-43e1-4fe2-86bf-68910d7066de
+    m_ActionName: Player/Interact[/Keyboard/e]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &7173938443999673930
 GameObject:
   m_ObjectHideFlags: 0

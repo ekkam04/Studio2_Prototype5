@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Ekkam {
     public class Player : MonoBehaviour
@@ -9,6 +10,8 @@ namespace Ekkam {
         public Transform orientation;
         public Transform cameraObj;
         public Transform playerObj;
+
+        public Transform itemHolder;
 
         public float rotationSpeed = 3f;
 
@@ -41,12 +44,16 @@ namespace Ekkam {
 
         public float groundDistance = 1f;
 
+        Inventory inventory;
+
         private void Start()
         {
             rb = GetComponent<Rigidbody>();
             anim = GetComponent<Animator>();
+            inventory = FindObjectOfType<Inventory>();
 
             cameraObj = FindObjectOfType<Camera>().transform;
+            itemHolder = GameObject.Find("ItemHolder").transform;
 
             gravity = -2 * jumpHeightApex / (jumpDuration * jumpDuration);
             initialJumpVelocity = Mathf.Abs(gravity) * jumpDuration;
@@ -57,8 +64,8 @@ namespace Ekkam {
 
         void Update()
         {
-            horizontalInput = Input.GetAxis("Horizontal");
-            verticalInput = Input.GetAxis("Vertical");
+            // horizontalInput = Input.GetAxis("Horizontal");
+            // verticalInput = Input.GetAxis("Vertical");
 
             playerObj.transform.rotation = Quaternion.Slerp(
                 playerObj.transform.rotation,
@@ -118,13 +125,46 @@ namespace Ekkam {
             // Limit velocity
             ControlSpeed();
 
+            // cycle next or previous based on mouse scroll
+            if (Input.mouseScrollDelta.y > 0)
+            {
+                inventory.CycleSlot(false);
+            }
+            else if (Input.mouseScrollDelta.y < 0)
+            {
+                inventory.CycleSlot(true);
+            }
+
+            RaycastHit hit2;
+            if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit2, 2f))
+            {
+                switch (hit2.collider.tag)
+                {
+                    case "Door":
+                        print("open door");
+                        break;
+                    case "Lighter":
+                        print("pick up");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            Debug.DrawRay(cameraObj.position, cameraObj.forward * 2f, Color.green);
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                inventory.UseItem();
+            }
+
         }
 
         void MovePlayer()
         {
             // Calculate movement direction
             // moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-            moveDirection = cameraObj.forward * verticalInput + cameraObj.right * horizontalInput;
+            // moveDirection = cameraObj.forward * verticalInput + cameraObj.right * horizontalInput;
+            moveDirection = new Vector3(cameraObj.forward.x * verticalInput, 0, cameraObj.forward.z * verticalInput) + new Vector3(cameraObj.right.x * horizontalInput, 0, cameraObj.right.z * horizontalInput);
 
             rb.AddForce(moveDirection * speed * 10f, ForceMode.Force);
         }
@@ -175,6 +215,137 @@ namespace Ekkam {
             anim.SetBool("isJumping", true);
             jumpStartTime = Time.time;
             rb.velocity = Vector3.up * initialJumpVelocity;
+        }
+
+        public void Interact()
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit, 2f))
+            {
+                print(hit.collider.name);
+                switch (hit.collider.tag)
+                {
+                    case "Lighter":
+                        PickUp(hit.collider.GetComponent<Item>());
+                        break;
+                    case "Key":
+                        PickUp(hit.collider.GetComponent<Item>());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public void InteractWithDoor()
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit, 2f))
+            {
+                print(hit.collider.name);
+                switch (hit.collider.tag)
+                {
+                    case "Door":
+                        if (hit.collider.GetComponent<Door>().color == Door.doorColor.red)
+                        {
+                            if (HasValidKey(Door.doorColor.red))
+                            {
+                                print("has valid key");
+                                hit.collider.GetComponent<Door>().Open();
+                            }
+                            else
+                            {
+                                print("no valid key");
+                            }
+                        }
+                        else if (hit.collider.GetComponent<Door>().color == Door.doorColor.blue)
+                        {
+                            if (HasValidKey(Door.doorColor.blue))
+                            {
+                                print("has valid key");
+                                hit.collider.GetComponent<Door>().Open();
+                            }
+                            else
+                            {
+                                print("no valid key");
+                            }
+                        }
+                        break;
+                    default:
+                        print("no door");
+                        break;
+                }
+            } 
+        }
+
+        public void PickUp(Item item)
+        {
+            inventory.AddItem(item);
+
+            item.transform.SetParent(itemHolder);
+            item.transform.localPosition = item.itemHolderPosition;
+            item.transform.localRotation = Quaternion.identity;
+
+            item.GetComponent<Collider>().enabled = false;
+        }
+
+        public bool HasValidKey(Door.doorColor color)
+        {
+            switch (color)
+            {
+                case Door.doorColor.red:
+                    foreach (Item item in inventory.items)
+                    {
+                        if (item.tag == "Key" && item.GetComponent<Key>().color == Key.keyColor.red)
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                case Door.doorColor.blue:
+                    foreach (Item item in inventory.items)
+                    {
+                        if (item.tag == "Key" && item.GetComponent<Key>().color == Key.keyColor.blue)
+                        {
+                            return true;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            Vector2 input = context.ReadValue<Vector2>();
+            horizontalInput = input.x;
+            verticalInput = input.y;
+        }
+
+        public void OnCycleNext(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                inventory.CycleSlot(true);
+            }
+        }
+
+        public void OnCyclePrevious(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                inventory.CycleSlot(false);
+            }
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                Interact();
+            }
         }
     }
 }
