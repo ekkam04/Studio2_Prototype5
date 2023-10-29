@@ -4867,6 +4867,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flame: {fileID: 9128174299364131806}
   hinge: {fileID: 2201819175931653957}
+  flameLight: {fileID: 5278691768069459850}
+  fuel: 100
+  fuelSlider: {fileID: 0}
+  fuelBurnRate: 2
 --- !u!114 &4818283821850432679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4880,8 +4884,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemTexture: {fileID: 2800000, guid: 0555ac1d9ece7514caea9963e54a8f7f, type: 3}
-  itemSize: 40
+  itemSize: 115
   itemHolderPosition: {x: -0.092, y: -1.185, z: 0.053}
+  useText: Toggle lighter
 --- !u!65 &867088659543366451
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5584,7 +5589,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8494338293197543839
 Transform:
   m_ObjectHideFlags: 0

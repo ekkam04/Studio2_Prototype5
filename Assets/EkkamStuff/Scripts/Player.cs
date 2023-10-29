@@ -45,12 +45,14 @@ namespace Ekkam {
         public float groundDistance = 1f;
 
         Inventory inventory;
+        UIManager uiManager;
 
         private void Start()
         {
             rb = GetComponent<Rigidbody>();
             anim = GetComponent<Animator>();
             inventory = FindObjectOfType<Inventory>();
+            uiManager = FindObjectOfType<UIManager>();
 
             cameraObj = FindObjectOfType<Camera>().transform;
             itemHolder = GameObject.Find("ItemHolder").transform;
@@ -125,7 +127,41 @@ namespace Ekkam {
             // Limit velocity
             ControlSpeed();
 
-            // cycle next or previous based on mouse scroll
+            // Interact Prompts
+            RaycastHit hit2;
+            if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit2, 2f))
+            {
+                switch (hit2.collider.tag)
+                {
+                    case "Lighter":
+                        uiManager.ShowInteractPrompt("Pick up");
+                        break;
+                    case "Key":
+                        uiManager.ShowInteractPrompt("Pick up");
+                        break;
+                    case "Fuel":
+                        foreach (Item item in inventory.items)
+                        {
+                            if (item.tag == "Lighter")
+                            {
+                                uiManager.ShowInteractPrompt("Refuel lighter");
+                            }
+                        }
+                        break;
+                    case "Generator":
+                        uiManager.ShowInteractPrompt("Fix generator");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                uiManager.HideInteractPrompt();
+            }
+            Debug.DrawRay(cameraObj.position, cameraObj.forward * 2f, Color.green);
+
+            // Cycle next or previous based on mouse scroll
             if (Input.mouseScrollDelta.y > 0)
             {
                 inventory.CycleSlot(false);
@@ -134,23 +170,6 @@ namespace Ekkam {
             {
                 inventory.CycleSlot(true);
             }
-
-            RaycastHit hit2;
-            if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit2, 2f))
-            {
-                switch (hit2.collider.tag)
-                {
-                    case "Door":
-                        print("open door");
-                        break;
-                    case "Lighter":
-                        print("pick up");
-                        break;
-                    default:
-                        break;
-                }
-            }
-            Debug.DrawRay(cameraObj.position, cameraObj.forward * 2f, Color.green);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -230,6 +249,29 @@ namespace Ekkam {
                         break;
                     case "Key":
                         PickUp(hit.collider.GetComponent<Item>());
+                        break;
+                    case "Fuel":
+                        foreach (Item item in inventory.items)
+                        {
+                            if (item.tag == "Lighter")
+                            {
+                                item.GetComponent<Lighter>().Refuel();
+                                Destroy(hit.collider.gameObject);
+                            }
+                        }
+                        break;
+                    case "Generator":
+                        print("Fix generator");
+                        // temporary ---
+                        // find all doors with yellow locks and open them
+                        foreach (Door door in FindObjectsOfType<Door>())
+                        {
+                            if (door.color == Door.doorColor.yellow)
+                            {
+                                door.Open();
+                            }
+                        }
+                        // temporary ---
                         break;
                     default:
                         break;

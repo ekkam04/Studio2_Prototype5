@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Ekkam {
     public class Key : MonoBehaviour
     {
         public enum keyColor { red, blue };
         public keyColor color;
+
+        [SerializeField] Texture2D redKeyTexture;
+        [SerializeField] Texture2D blueKeyTexture;
 
         bool isUsed = false;
         float timer = 0f;
@@ -23,9 +27,11 @@ namespace Ekkam {
                 {
                     case keyColor.red:
                         child.GetComponent<MeshRenderer>().material.color = Color.red;
+                        GetComponent<Item>().itemTexture = redKeyTexture;
                         break;
                     case keyColor.blue:
                         child.GetComponent<MeshRenderer>().material.color = Color.blue;
+                        GetComponent<Item>().itemTexture = blueKeyTexture;
                         break;
                     default:
                         break;

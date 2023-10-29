@@ -22,10 +22,12 @@ namespace Ekkam {
 
         private float slotPositionX = 0f;
         Player player;
+        UIManager uiManager;
 
         void Start()
         {
             player = GetComponent<Player>();
+            uiManager = GameObject.FindObjectOfType<UIManager>();
             // Create slots as raw image with texture 0
             for (int i = 0; i < slotCount; i++)
             {
@@ -38,7 +40,9 @@ namespace Ekkam {
                 tempColor.a = slotTransparency;
                 slot.GetComponent<RawImage>().color = tempColor;
                 
-                slot.GetComponent<RectTransform>().sizeDelta = new Vector2(slotSize, slotSize);
+                float scaleFactor = slot.GetComponentInParent<Canvas>().scaleFactor;
+                slot.GetComponent<RectTransform>().sizeDelta = new Vector2(slotSize * scaleFactor, slotSize * scaleFactor);
+
                 slot.GetComponent<RectTransform>().localPosition = new Vector3(slotPositionX, slotPositionYOffset, 0);
                 slotPositionX += slotPositionXOffset;
                 slots.Add(slot);
@@ -95,7 +99,10 @@ namespace Ekkam {
                     itemObj.transform.SetParent(slot.transform);
                     itemObj.AddComponent<RawImage>();
                     itemObj.GetComponent<RawImage>().texture = item.itemTexture;
-                    itemObj.GetComponent<RectTransform>().sizeDelta = new Vector2(item.itemSize, item.itemSize);
+
+                    float scaleFactor = itemObj.GetComponentInParent<Canvas>().scaleFactor;
+                    itemObj.GetComponent<RectTransform>().sizeDelta = new Vector2(item.itemSize * scaleFactor, item.itemSize * scaleFactor);
+
                     itemObj.GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
                     items.Add(item);
                     break;
@@ -133,11 +140,22 @@ namespace Ekkam {
                 item.gameObject.SetActive(false);
             }
 
+            uiManager.HideLighterUI();
+
             // show item in selected slot
             if (selectedSlot.transform.childCount > 0)
             {
                 Item item = items[slots.IndexOf(selectedSlot)];
                 item.gameObject.SetActive(true);
+                uiManager.ShowUsePrompt(item.useText);
+                if (item.tag == "Lighter")
+                {
+                    uiManager.ShowLighterUI();
+                }
+            }
+            else
+            {
+                uiManager.HideUsePrompt();
             }
         }
     }

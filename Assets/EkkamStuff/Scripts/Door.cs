@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Ekkam {
 public class Door : MonoBehaviour
     {
-        public enum doorColor { red, blue };
+        public enum doorColor { red, blue, yellow };
         public doorColor color;
 
         [SerializeField] GameObject frontLock;
@@ -39,6 +39,16 @@ public class Door : MonoBehaviour
                         child.GetComponent<MeshRenderer>().material.color = Color.blue;
                     }
                     break;
+                case doorColor.yellow:
+                    foreach (Transform child in frontLock.transform)
+                    {
+                        child.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                    }
+                    foreach (Transform child in backLock.transform)
+                    {
+                        child.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -50,6 +60,7 @@ public class Door : MonoBehaviour
             {
                 anim.SetBool("open", true);
                 isOpen = true;
+                GetComponent<BoxCollider>().enabled = false;
             }
         }
 

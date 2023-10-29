@@ -8,6 +8,7 @@ namespace Ekkam {
         public Texture2D itemTexture;
         public float itemSize = 50f;
         public Vector3 itemHolderPosition;
+        public string useText;
 
         void Start()
         {
