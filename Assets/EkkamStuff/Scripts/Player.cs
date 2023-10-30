@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Ekkam {
     public class Player : MonoBehaviour
     {
+        public bool allowMovement = true;
 
         public Transform orientation;
         public Transform cameraObj;
@@ -47,12 +49,19 @@ namespace Ekkam {
         Inventory inventory;
         UIManager uiManager;
 
+        Cinemachine.CinemachineInputProvider cinemachineInputProvider;
+
+        public AudioSource audioSource;
+        public AudioClip doorUnlockSound;
+
         private void Start()
         {
             rb = GetComponent<Rigidbody>();
             anim = GetComponent<Animator>();
             inventory = FindObjectOfType<Inventory>();
             uiManager = FindObjectOfType<UIManager>();
+            cinemachineInputProvider = GetComponentInChildren<Cinemachine.CinemachineInputProvider>();
+            audioSource = GetComponent<AudioSource>();
 
             cameraObj = FindObjectOfType<Camera>().transform;
             itemHolder = GameObject.Find("ItemHolder").transform;
@@ -60,8 +69,8 @@ namespace Ekkam {
             gravity = -2 * jumpHeightApex / (jumpDuration * jumpDuration);
             initialJumpVelocity = Mathf.Abs(gravity) * jumpDuration;
 
-            // Cursor.lockState = CursorLockMode.Locked;
-            // Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         void Update()
@@ -112,7 +121,7 @@ namespace Ekkam {
 
             if (isGrounded && !isJumping)
             {
-                anim.SetBool("isJumping", false);
+                // anim.SetBool("isJumping", false);
             }
 
             if (isGrounded)
@@ -149,7 +158,17 @@ namespace Ekkam {
                         }
                         break;
                     case "Generator":
-                        uiManager.ShowInteractPrompt("Fix generator");
+                        if (hit2.collider.GetComponent<Generator>().isFixed || FindObjectOfType<GeneratorFixing>().generatorFixingUI.activeSelf)
+                        {
+                            uiManager.HideInteractPrompt();
+                        }
+                        else
+                        {
+                            uiManager.ShowInteractPrompt("Fix generator");
+                        }
+                        break;
+                    case "Elevator":
+                        uiManager.ShowInteractPrompt("Use elevator");
                         break;
                     default:
                         break;
@@ -174,6 +193,27 @@ namespace Ekkam {
             if (Input.GetMouseButtonDown(0))
             {
                 inventory.UseItem();
+            }
+
+            // if (Input.GetKeyDown(KeyCode.F))
+            // {
+            //     FindObjectOfType<GeneratorFixing>().StartFixing(Generator.generatorColor.yellow);
+            // }
+
+            // if (Input.GetKeyDown(KeyCode.G))
+            // {
+            //     FindObjectOfType<GeneratorFixing>().FinishFixing();
+            // }
+
+            if (!allowMovement)
+            {
+                // disable cinemachine input provider
+                cinemachineInputProvider.enabled = false;
+            }
+            else
+            {
+                // enable cinemachine input provider
+                cinemachineInputProvider.enabled = true;
             }
 
         }
@@ -231,7 +271,7 @@ namespace Ekkam {
             currentJumpDuration = duration;
 
             isJumping = true;
-            anim.SetBool("isJumping", true);
+            // anim.SetBool("isJumping", true);
             jumpStartTime = Time.time;
             rb.velocity = Vector3.up * initialJumpVelocity;
         }
@@ -261,17 +301,22 @@ namespace Ekkam {
                         }
                         break;
                     case "Generator":
-                        print("Fix generator");
-                        // temporary ---
-                        // find all doors with yellow locks and open them
-                        foreach (Door door in FindObjectsOfType<Door>())
-                        {
-                            if (door.color == Door.doorColor.yellow)
-                            {
-                                door.Open();
-                            }
-                        }
-                        // temporary ---
+                        // print("Fix generator");
+                        // // temporary ---
+                        // // find all doors with yellow locks and open them
+                        // foreach (Door door in FindObjectsOfType<Door>())
+                        // {
+                        //     if (door.color == Door.doorColor.yellow)
+                        //     {
+                        //         door.Open();
+                        //     }
+                        // }
+                        // // temporary ---
+                        if (hit.collider.GetComponent<Generator>().isFixed) return;
+                        hit.collider.GetComponent<Generator>().StartFixing();
+                        break;
+                    case "Elevator":
+                        SceneManager.LoadScene("Level 2");
                         break;
                     default:
                         break;
@@ -293,6 +338,7 @@ namespace Ekkam {
                             if (HasValidKey(Door.doorColor.red))
                             {
                                 print("has valid key");
+                                audioSource.PlayOneShot(doorUnlockSound);
                                 hit.collider.GetComponent<Door>().Open();
                             }
                             else
@@ -305,6 +351,7 @@ namespace Ekkam {
                             if (HasValidKey(Door.doorColor.blue))
                             {
                                 print("has valid key");
+                                audioSource.PlayOneShot(doorUnlockSound);
                                 hit.collider.GetComponent<Door>().Open();
                             }
                             else
@@ -361,6 +408,7 @@ namespace Ekkam {
 
         public void OnMove(InputAction.CallbackContext context)
         {
+            if (!allowMovement) return;
             Vector2 input = context.ReadValue<Vector2>();
             horizontalInput = input.x;
             verticalInput = input.y;

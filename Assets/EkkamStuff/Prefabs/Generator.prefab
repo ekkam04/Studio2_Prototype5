@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 135030608602041609}
   - component: {fileID: 8204520591593128725}
+  - component: {fileID: 8061863632764779111}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Generator
@@ -56,6 +57,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 68.39328, y: 44.7945, z: 41.33675}
   m_Center: {x: -7.252622, y: 23.185106, z: -3.60353}
+--- !u!114 &8061863632764779111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4488290161304393699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01c756d369ce55c41907858c2212b8f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: 0
+  isFixed: 0
+  objectsToEnableOnFix: []
 --- !u!1 &5342983309397210250
 GameObject:
   m_ObjectHideFlags: 0
