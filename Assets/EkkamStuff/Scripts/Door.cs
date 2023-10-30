@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Ekkam {
 public class Door : MonoBehaviour
     {
-        public enum doorColor { red, blue, yellow };
+        public enum doorColor { red, blue, yellow, green };
         public doorColor color;
 
         [SerializeField] GameObject frontLock;
@@ -47,6 +47,16 @@ public class Door : MonoBehaviour
                     foreach (Transform child in backLock.transform)
                     {
                         child.GetComponent<MeshRenderer>().material.color = Color.yellow;
+                    }
+                    break;
+                case doorColor.green:
+                    foreach (Transform child in frontLock.transform)
+                    {
+                        child.GetComponent<MeshRenderer>().material.color = Color.green;
+                    }
+                    foreach (Transform child in backLock.transform)
+                    {
+                        child.GetComponent<MeshRenderer>().material.color = Color.green;
                     }
                     break;
                 default:
