@@ -7,7 +7,7 @@ public class MainMenuController : MonoBehaviour
 {
     public void StartLevel1()
     {
-        SceneManager.LoadScene("EkkamScene");
+        SceneManager.LoadScene("AbbasScene");
     }
 
     public void StartLevel2()

@@ -54,6 +54,10 @@ namespace Ekkam {
         public AudioSource audioSource;
         public AudioClip doorUnlockSound;
 
+        public Vector3 spawnPoint;
+        public int lives = 3;
+        public bool getHitByGhost = true;
+
         private void Start()
         {
             rb = GetComponent<Rigidbody>();
@@ -62,6 +66,9 @@ namespace Ekkam {
             uiManager = FindObjectOfType<UIManager>();
             cinemachineInputProvider = GetComponentInChildren<Cinemachine.CinemachineInputProvider>();
             audioSource = GetComponent<AudioSource>();
+            spawnPoint = transform.position;
+
+            uiManager.UpdateLives(lives);
 
             cameraObj = FindObjectOfType<Camera>().transform;
             itemHolder = GameObject.Find("ItemHolder").transform;
@@ -170,6 +177,9 @@ namespace Ekkam {
                     case "Elevator":
                         uiManager.ShowInteractPrompt("Use elevator");
                         break;
+                    case "End":
+                        uiManager.ShowInteractPrompt("Escape!");
+                        break;
                     default:
                         break;
                 }
@@ -192,7 +202,17 @@ namespace Ekkam {
 
             if (Input.GetMouseButtonDown(0))
             {
-                inventory.UseItem();
+                if (FindObjectOfType<GeneratorFixing>() != null)
+                {
+                    if (!FindObjectOfType<GeneratorFixing>().generatorFixingUI.activeSelf)
+                    {
+                        inventory.UseItem();
+                    }
+                }
+                else
+                {
+                    inventory.UseItem();
+                }
             }
 
             // if (Input.GetKeyDown(KeyCode.F))
@@ -282,6 +302,7 @@ namespace Ekkam {
             if (Physics.Raycast(cameraObj.position, cameraObj.forward * 2, out hit, 2f))
             {
                 print(hit.collider.name);
+                
                 switch (hit.collider.tag)
                 {
                     case "Lighter":
@@ -317,6 +338,14 @@ namespace Ekkam {
                         break;
                     case "Elevator":
                         SceneManager.LoadScene("Level 2");
+                        break;
+                    case "End":
+                        getHitByGhost = false;
+                        allowMovement = false;
+                        horizontalInput = 0;
+                        verticalInput = 0;
+                        rb.velocity = Vector3.zero;
+                        uiManager.ShowWinUI();
                         break;
                     default:
                         break;
@@ -437,5 +466,38 @@ namespace Ekkam {
                 Interact();
             }
         }
+
+        private void OnTriggerEnter(Collider other) {
+            if (other.gameObject.tag == "Ghost" && getHitByGhost)
+            {
+                getHitByGhost = false;
+                allowMovement = false;
+                horizontalInput = 0;
+                verticalInput = 0;
+                rb.velocity = Vector3.zero;
+                lives--;
+                uiManager.UpdateLives(lives);
+
+                if (lives <= 0)
+                {
+                    uiManager.ShowLoseUI();
+                }
+                else
+                {
+                    print("Player hit by ghost");
+                    uiManager.ShowBlackPanels();
+                    Invoke("EnableGettingHitByGhost", 1f);
+                }
+            }
+        }
+
+        void EnableGettingHitByGhost()
+        {
+            transform.position = spawnPoint;
+            allowMovement = true;
+            getHitByGhost = true;
+            uiManager.HideBlackPanels();
+        }
+
     }
 }
